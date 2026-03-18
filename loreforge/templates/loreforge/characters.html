@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Characters</title>
+  </head>
+  <body>
+    <a href="/factions/">View Factions</a>
+    <br /><br />
+    <h1>Characters</h1>
+
+    <ul>
+      {% for character in characters %}
+      <li>
+        <strong>{{ character.name }}</strong><br />
+        <strong>Role: </strong>{{ character.role }}<br />
+        <strong>Faction: </strong> {{ character.faction.name }}<br />
+        <strong>Mentor: </strong>
+        {% if character.mentor %} {{ character.mentor.name }} {% else %} Unknown
+        {% endif %}
+      </li>
+      <br />
+      {% empty %}
+      <li>No characters found.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Factions</title>
+  </head>
+  <body>
+    <a href="/characters/">View Characters</a>
+    <br /><br />
+    <h1>Factions</h1>
+
+    <ul>
+      {% for faction in factions %}
+      <li>{{ faction.name }}</li>
+      {% empty %}
+      <li>No factions found.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
