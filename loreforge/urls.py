@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # Main URL
+    path("", views.home, name="home"),
     # Faction List Url
     path("factions/", views.factions_list, name="factions_list"),
     # Add Faction Form Url

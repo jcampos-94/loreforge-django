@@ -4,13 +4,18 @@ from .models import Faction, Character
 from .forms import FactionForm, CharacterForm
 
 
-# Faction view
+# Main page (landing view)
+def home(request):
+    return render(request, "loreforge/home.html")
+
+
+# Display all factions
 def factions_list(request):
     factions = Faction.objects.all()
     return render(request, "loreforge/factions.html", {"factions": factions})
 
 
-# Add Faction Form view
+# Create a new faction (form handling)
 def add_faction(request):
     if request.method == "POST":
         form = FactionForm(request.POST)
@@ -23,18 +28,19 @@ def add_faction(request):
     return render(request, "loreforge/add_faction.html", {"form": form})
 
 
-# Delete Faction Form view
+# Delete a faction (with confirmation)
 def delete_faction(request, faction_id):
     faction = get_object_or_404(Faction, id=faction_id)
 
-    # Check if faction has members:
+    # Get all characters in this faction
     members = Character.objects.filter(faction=faction)
 
     if request.method == "POST":
-        members.delete()
-        faction.delete()
+        members.delete()  # Delete all characters in faction
+        faction.delete()  # Then delete the faction itself
         return redirect("factions_list")
 
+    # Show confirmation page with warning
     return render(
         request,
         "loreforge/delete_faction.html",
@@ -42,37 +48,37 @@ def delete_faction(request, faction_id):
     )
 
 
-# Character view
+# Display all characters
 def characters_list(request):
+    # Optimize query by loading related faction and mentor in one go
     characters = Character.objects.select_related("faction", "mentor").all()
     return render(request, "loreforge/characters.html", {"characters": characters})
 
 
-# Add Character Form view
+# Create a new character (form handling)
 def add_character(request):
     if request.method == "POST":
-        form = CharacterForm(request.POST)
+        form = CharacterForm(request.POST)  # Bind submitted data
         if form.is_valid():
-            character = form.save()
-
+            character = form.save()  # Save character
             return redirect("characters_list")
     else:
-        form = CharacterForm()
+        form = CharacterForm()  # Empty form for GET request
 
     return render(request, "loreforge/add_character.html", {"form": form})
 
 
-# Delete Character Form view
+# Delete a character with mentorship and leadership handling
 def delete_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
     faction = character.faction
 
-    # Check leadership and mentorship before deleting
+    # Check if character is leader and store their mentor
     is_leader = faction.leader == character
     mentor = character.mentor
 
     if request.method == "POST":
-        # STEP 1 — Reassign students
+        # STEP 1 — RReassign students to the deleted character's mentor
         students = Character.objects.filter(mentor=character)
 
         for student in students:
@@ -82,16 +88,15 @@ def delete_character(request, character_id):
         # STEP 2 — Delete Character
         character.delete()
 
-        # STEP 3 — Handle leader logic
-        # Get remaining members of faction
+        # STEP 3 — Handle leader reassignment
         remaining_members = Character.objects.filter(faction=faction)
 
         if is_leader:
             if not remaining_members.exists():
-                # Delete empty faction
+                # If no members remain, delete faction
                 faction.delete()
             else:
-                # Promote first member
+                # Promote first available member as new leader
                 new_leader = remaining_members.first()
                 faction.leader = new_leader
                 new_leader.role = f"Leader of the {faction.name}"
@@ -103,18 +108,21 @@ def delete_character(request, character_id):
     return render(request, "loreforge/delete_character.html", {"character": character})
 
 
-# Mentorship Tree
+# Recursively build mentorship hierarchy
 def build_tree(character):
+    # Get all direct students of this character
     students = Character.objects.filter(mentor=character)
 
     return {
         "character": character,
+        # Recursively build subtree for each student
         "students": [build_tree(student) for student in students],
     }
 
 
+# Display mentorship tree starting from a character
 def mentorship_tree(request, character_id):
     character = get_object_or_404(Character, id=character_id)
-    tree = build_tree(character)
+    tree = build_tree(character)  # Build full hierarchy
 
     return render(request, "loreforge/mentorship_tree.html", {"tree": tree})

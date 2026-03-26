@@ -1,11 +1,15 @@
+<!-- Recursive template for displaying mentorship hierarchy -->
 <!-- prettier-ignore -->
-<ul>
+<ul class="tree">
   <li>
-      {{ node.character.name }}
+    <!-- Display current character -->
+    <span class="node">└── {{ node.character.name }}</span>
 
       {% if node.students %}
+      <!-- Loop through all direct students -->
         {% for student in node.students %}
-            {% include "loreforge/tree_node.html" with node=student %}
+          <!-- Recursive include: renders this same template for each student -->
+          {% include "loreforge/tree_node.html" with node=student %}
         {% endfor %}
       {% endif %}
   </li>
