@@ -23,6 +23,25 @@ def add_faction(request):
     return render(request, "loreforge/add_faction.html", {"form": form})
 
 
+# Delete Faction Form view
+def delete_faction(request, faction_id):
+    faction = get_object_or_404(Faction, id=faction_id)
+
+    # Check if faction has members:
+    members = Character.objects.filter(faction=faction)
+
+    if request.method == "POST":
+        members.delete()
+        faction.delete()
+        return redirect("factions_list")
+
+    return render(
+        request,
+        "loreforge/delete_faction.html",
+        {"faction": faction, "members": members},
+    )
+
+
 # Character view
 def characters_list(request):
     characters = Character.objects.select_related("faction", "mentor").all()

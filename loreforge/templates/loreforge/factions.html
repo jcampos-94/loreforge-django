@@ -17,7 +17,9 @@
       <li><strong>{{ faction.name }}</strong></li>
       <strong>Leader:</strong>
       {% if faction.leader %} {{ faction.leader.name }}<br />
-      {% else %} None {% endif %} {% empty %}
+      {% else %} None <br/ > {% endif %}
+      <a href="/delete-faction/{{ faction.id }}/">Delete</a>
+      {% empty %}
       <li>No factions found.</li>
       {% endfor %}
     </ul>
