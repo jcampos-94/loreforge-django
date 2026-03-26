@@ -93,3 +93,20 @@ def delete_character(request, character_id):
         return redirect("characters_list")
 
     return render(request, "loreforge/delete_character.html", {"character": character})
+
+
+# Mentorship Tree
+def build_tree(character):
+    students = Character.objects.filter(mentor=character)
+
+    return {
+        "character": character,
+        "students": [build_tree(student) for student in students],
+    }
+
+
+def mentorship_tree(request, character_id):
+    character = get_object_or_404(Character, id=character_id)
+    tree = build_tree(character)
+
+    return render(request, "loreforge/mentorship_tree.html", {"tree": tree})

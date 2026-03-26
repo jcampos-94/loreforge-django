@@ -22,6 +22,8 @@
         {% if character.mentor %} {{ character.mentor.name }}<br />
         {% else %} Unknown<br />
         {% endif %}
+        <a href="/mentorship-tree/{{ character.id }}/">View Mentorship Tree</a
+        ><br />
         <a href="/delete-character/{{ character.id }}/">Delete</a>
       </li>
       <br />

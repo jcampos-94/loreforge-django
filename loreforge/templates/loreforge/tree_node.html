@@ -1,0 +1,12 @@
+<!-- prettier-ignore -->
+<ul>
+  <li>
+      {{ node.character.name }}
+
+      {% if node.students %}
+        {% for student in node.students %}
+            {% include "loreforge/tree_node.html" with node=student %}
+        {% endfor %}
+      {% endif %}
+  </li>
+</ul>
