@@ -65,16 +65,24 @@ def add_character(request):
 # Delete Character Form view
 def delete_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
+    faction = character.faction
+
+    # Check leadership and mentorship before deleting
+    is_leader = faction.leader == character
+    mentor = character.mentor
 
     if request.method == "POST":
-        faction = character.faction
+        # STEP 1 — Reassign students
+        students = Character.objects.filter(mentor=character)
 
-        # Check leadership before deleting
-        is_leader = faction.leader == character
+        for student in students:
+            student.mentor = mentor  # inherit mentor
+            student.save()
 
-        # Delete Character
+        # STEP 2 — Delete Character
         character.delete()
 
+        # STEP 3 — Handle leader logic
         # Get remaining members of faction
         remaining_members = Character.objects.filter(faction=faction)
 
