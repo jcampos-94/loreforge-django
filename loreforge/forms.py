@@ -5,18 +5,42 @@ from .models import Faction, Character
 
 # Name Formatter - remove empty spaces and capitalize
 def format_name(value):
-    return value.strip().title()
+    words = value.strip().lower().split(" ")
+    return " ".join(word.capitalize() for word in words)
 
 
 # Faction Form
 class FactionForm(forms.ModelForm):
+    leader_name = forms.CharField(max_length=100)
+
     class Meta:
         model = Faction
-        fields = ["name"]
+        fields = ["name", "leader_name"]
 
     def clean_name(self):
-        name = self.cleaned_data["name"]
-        return format_name(name)
+        return format_name(self.cleaned_data["name"])
+
+    def clean_leader_name(self):
+        return format_name(self.cleaned_data["leader_name"])
+
+    def save(self, commit=True):
+        faction = super().save(commit=False)
+
+        leader_name = self.cleaned_data["leader_name"]
+
+        if commit:
+            faction.save()
+
+            # Create leader Character
+            leader = Character.objects.create(
+                name=leader_name, role=f"Leader of the {faction.name}", faction=faction
+            )
+
+            # Assign leader to faction
+            faction.leader = leader
+            faction.save()
+
+        return faction
 
 
 # Character Form

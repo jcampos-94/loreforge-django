@@ -36,13 +36,6 @@ def add_character(request):
         if form.is_valid():
             character = form.save()
 
-            # If faction has no leader, assign this character
-            if not character.faction.leader:
-                character.faction.leader = character
-                character.role = "Leader"
-                character.save()
-                character.faction.save()
-
             return redirect("characters_list")
     else:
         form = CharacterForm()
@@ -74,7 +67,7 @@ def delete_character(request, character_id):
                 # Promote first member
                 new_leader = remaining_members.first()
                 faction.leader = new_leader
-                new_leader.role = "Leader of the " + faction.name
+                new_leader.role = f"Leader of the {faction.name}"
                 new_leader.save()
                 faction.save()
 
