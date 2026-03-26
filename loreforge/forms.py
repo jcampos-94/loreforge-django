@@ -1,6 +1,6 @@
 from django import forms
-from .models import Faction, Character
 from django.core.exceptions import ValidationError
+from .models import Faction, Character
 
 
 # Name Formatter - remove empty spaces and capitalize

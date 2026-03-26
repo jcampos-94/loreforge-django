@@ -10,4 +10,10 @@ urlpatterns = [
     path("characters/", views.characters_list, name="characters_list"),
     # Add Character Form Url
     path("add-character/", views.add_character, name="add_character"),
+    # Delete Character Form Url
+    path(
+        "delete-character/<int:character_id>/",
+        views.delete_character,
+        name="delete_character",
+    ),
 ]

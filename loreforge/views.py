@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404
 from .models import Faction, Character
 from .forms import FactionForm, CharacterForm
 
@@ -9,7 +10,7 @@ def factions_list(request):
     return render(request, "loreforge/factions.html", {"factions": factions})
 
 
-# Faction Form view
+# Add Faction Form view
 def add_faction(request):
     if request.method == "POST":
         form = FactionForm(request.POST)
@@ -28,7 +29,7 @@ def characters_list(request):
     return render(request, "loreforge/characters.html", {"characters": characters})
 
 
-# Character Form view
+# Add Character Form view
 def add_character(request):
     if request.method == "POST":
         form = CharacterForm(request.POST)
@@ -39,3 +40,14 @@ def add_character(request):
         form = CharacterForm()
 
     return render(request, "loreforge/add_character.html", {"form": form})
+
+
+# Delete Character Form view
+def delete_character(request, character_id):
+    character = get_object_or_404(Character, id=character_id)
+
+    if request.method == "POST":
+        character.delete()
+        return redirect("characters_list")
+
+    return render(request, "loreforge/delete_character.html", {"character": character})

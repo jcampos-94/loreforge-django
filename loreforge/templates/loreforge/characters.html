@@ -19,8 +19,10 @@
         <strong>Role: </strong>{{ character.role }}<br />
         <strong>Faction: </strong> {{ character.faction.name }}<br />
         <strong>Mentor: </strong>
-        {% if character.mentor %} {{ character.mentor.name }} {% else %} Unknown
+        {% if character.mentor %} {{ character.mentor.name }}<br />
+        {% else %} Unknown<br />
         {% endif %}
+        <a href="/delete-character/{{ character.id }}/">Delete</a>
       </li>
       <br />
       {% empty %}
