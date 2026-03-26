@@ -14,8 +14,10 @@
 
     <ul>
       {% for faction in factions %}
-      <li>{{ faction.name }}</li>
-      {% empty %}
+      <li><strong>{{ faction.name }}</strong></li>
+      <strong>Leader:</strong>
+      {% if faction.leader %} {{ faction.leader.name }}<br />
+      {% else %} None {% endif %} {% empty %}
       <li>No factions found.</li>
       {% endfor %}
     </ul>

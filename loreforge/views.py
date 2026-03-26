@@ -34,7 +34,15 @@ def add_character(request):
     if request.method == "POST":
         form = CharacterForm(request.POST)
         if form.is_valid():
-            form.save()
+            character = form.save()
+
+            # If faction has no leader, assign this character
+            if not character.faction.leader:
+                character.faction.leader = character
+                character.role = "Leader"
+                character.save()
+                character.faction.save()
+
             return redirect("characters_list")
     else:
         form = CharacterForm()
@@ -47,7 +55,29 @@ def delete_character(request, character_id):
     character = get_object_or_404(Character, id=character_id)
 
     if request.method == "POST":
+        faction = character.faction
+
+        # Check leadership before deleting
+        is_leader = faction.leader == character
+
+        # Delete Character
         character.delete()
+
+        # Get remaining members of faction
+        remaining_members = Character.objects.filter(faction=faction)
+
+        if is_leader:
+            if not remaining_members.exists():
+                # Delete empty faction
+                faction.delete()
+            else:
+                # Promote first member
+                new_leader = remaining_members.first()
+                faction.leader = new_leader
+                new_leader.role = "Leader of the " + faction.name
+                new_leader.save()
+                faction.save()
+
         return redirect("characters_list")
 
     return render(request, "loreforge/delete_character.html", {"character": character})

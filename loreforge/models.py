@@ -4,6 +4,13 @@ from django.db import models
 # Faction model
 class Faction(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    leader = models.ForeignKey(
+        "Character",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="leading_faction",
+    )
 
     def __str__(self):
         return self.name
